@@ -1,7 +1,10 @@
 using Unity.Netcode;
+using Unity.Netcode.Components;
+using Unity.Collections;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerNetworkController : NetworkBehaviour
 {
@@ -10,8 +13,14 @@ public class PlayerNetworkController : NetworkBehaviour
     [Space(10), Header("Component References")]
     [SerializeField] private Animator localAnimator;
 
+    public NetworkVariable<FixedString32Bytes> nickname = new();
+    public int Score {get; set; } = 0;
+    [SerializeField] private NetworkAnimator networkAnimator;
+
     private readonly int isMovingParam = Animator.StringToHash("IsMoving");
     private readonly int isRunningParam = Animator.StringToHash("IsRunning");
+    private readonly int isCrouchingParam = Animator.StringToHash("IsCrouching");
+    private readonly int emoteParam = Animator.StringToHash("Emote");
 
     private int lastSentInputX = 0;
     private int serverInputX = 0;
@@ -34,8 +43,19 @@ public class PlayerNetworkController : NetworkBehaviour
         if (IsOwner)
         {
             RequestPositionRpc();
+            SubmitNameUpdateRpc(NicknamePanelManager.nickname);
         }
     }
+
+#region Callbacks
+    private void OnSceneLoadCompleted(ulong clientId, string sceneName, LoadSceneMode sceneMode)
+    {
+        if (sceneName.Equals("EndScene"))
+        {
+            gameObject.SetActive(false);
+        }
+    }
+#endregion
 
     private Vector3 GetRandomPosition()
     {
@@ -77,12 +97,19 @@ public class PlayerNetworkController : NetworkBehaviour
 
         int inputZ = Keyboard.current.wKey.isPressed ? 1 : 0;
         bool isRunning = Keyboard.current.leftShiftKey.isPressed;
+        bool isCrouching = Keyboard.current.cKey.isPressed;
 
         LastSentData = new PlayerNetworkData()
         {
             zDelta = inputZ,
-            isRunning = isRunning
+            isRunning = isRunning,
+            isCrouching = isCrouching
         };
+
+        if (Keyboard.current.tKey.wasPressedThisFrame)
+        {
+            SubmitEmoteRpc();
+        }
     }
 
     private void UpdateRotation()
@@ -108,10 +135,26 @@ public class PlayerNetworkController : NetworkBehaviour
 
     [Rpc(SendTo.Server,
         InvokePermission = RpcInvokePermission.Owner)]
+    private void SubmitEmoteRpc()
+    {
+        networkAnimator.SetTrigger(emoteParam);
+    }
+
+    [Rpc(SendTo.Server,
+        InvokePermission = RpcInvokePermission.Owner)]
     private void SubmitAnimatorUpdateRpc(PlayerNetworkData data)
     {
         localAnimator.SetBool(isMovingParam, data.zDelta != 0);
         localAnimator.SetBool(isRunningParam, data.isRunning);
+        localAnimator.SetBool(isCrouchingParam, data.isCrouching);
     }
+
+    [Rpc(SendTo.Server,
+        InvokePermission = RpcInvokePermission.Owner)]
+    private void SubmitNameUpdateRpc(FixedString32Bytes nickname)
+    {
+        this.nickname.Value = nickname;
+    }
+
     #endregion
 }
