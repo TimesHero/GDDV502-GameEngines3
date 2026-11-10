@@ -854,8 +854,8 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: GDDV502_CourseContent
-  metroPackageVersion: 
+  metroPackageName: GDDV502CourseContent
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -863,7 +863,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: GDDV502_CourseContent
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: GDDV502_CourseContent
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
