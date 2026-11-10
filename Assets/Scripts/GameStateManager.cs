@@ -2,10 +2,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
-using Unity.Profiling;
-using Unity.VisualScripting;
-using NUnit.Framework;
-using UnityEngine.AI;   // temporary: the test key in Step Eight
 
 public enum GameState : byte { Lobby, Countdown, Playing, Ended }
 
