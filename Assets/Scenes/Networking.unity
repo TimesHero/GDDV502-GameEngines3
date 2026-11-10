@@ -2716,7 +2716,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22400762, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000019073486
+      value: -0.00002670288
       objectReference: {fileID: 0}
     - target: {fileID: 22426080, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchorMax.x
@@ -3091,9 +3091,9 @@ MonoBehaviour:
   serverButton: {fileID: 386981627}
   hostButton: {fileID: 2103432214}
   clientButton: {fileID: 12577595}
-  addressInput: {fileID: 0}
-  connectionStatusText: {fileID: 0}
-  hostAddressText: {fileID: 0}
+  addressInput: {fileID: 527880200}
+  connectionStatusText: {fileID: 145286736}
+  hostAddressText: {fileID: 1318224398}
   port: 7777
 --- !u!114 &1521895452
 MonoBehaviour:

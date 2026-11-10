@@ -32,6 +32,7 @@ public class ConnectionManagerUI : MonoBehaviour
             ShowScorePanel();
         });
         hostButton.onClick.AddListener(() => { 
+            ConfigureAsHost();
             NetworkManager.Singleton.StartHost();
             ShowScorePanel();
         });
@@ -44,7 +45,7 @@ public class ConnectionManagerUI : MonoBehaviour
         NetworkManager.Singleton.OnClientDisconnectCallback += HandleDisconnect;
     }
 
-    private void Destroy()
+    private void OnDestroy()
     {
         if (NetworkManager.Singleton != null)
             NetworkManager.Singleton.OnClientDisconnectCallback -= HandleDisconnect;
@@ -104,7 +105,7 @@ public class ConnectionManagerUI : MonoBehaviour
         try
         {
             using Socket socket = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            socket.Connect("8.8.8.8", 65630);
+            socket.Connect("8.8.8.8", 65530);
             return ((IPEndPoint)socket.LocalEndPoint).Address.ToString();
         }
         catch (SocketException)
