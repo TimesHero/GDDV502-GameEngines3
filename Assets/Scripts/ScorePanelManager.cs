@@ -39,6 +39,12 @@ public class ScorePanelManager : NetworkBehaviour
         }
     }
 
+    public override void OnNetworkDespawn()
+    {
+        if(isServer)
+            NetworkManager.Singleton.OnConnectionEvent -= HandleConnectionEvents;
+    }
+
     private void OnDisable()
     {
         if (IsServer && NetworkManager.Singleton != null)
@@ -122,7 +128,14 @@ public class ScorePanelManager : NetworkBehaviour
         RemoveScoreEntryRpc(clientId);
     }
     #endregion
+    public void ClearEntries()
+    {
+        foreach (GameObject entry in scoreEntries.Values)
+            Destroy(entry);
 
+        scoreEntries.Clear();
+        scorePanel.gameObject.SetActive(false);
+    }
     #region RPCs
     [Rpc(SendTo.SpecifiedInParams,
         InvokePermission = RpcInvokePermission.Server)]
