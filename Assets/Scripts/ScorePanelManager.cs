@@ -41,7 +41,7 @@ public class ScorePanelManager : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        if(isServer)
+        if(IsServer)
             NetworkManager.Singleton.OnConnectionEvent -= HandleConnectionEvents;
     }
 
