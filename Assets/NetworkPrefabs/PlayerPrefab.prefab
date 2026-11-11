@@ -350,6 +350,9 @@ PrefabInstance:
       addedObject: {fileID: -5072645187109816690}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: eff298bd2af8ad67da108e4a0d477ff7, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1744793409788919269}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: eff298bd2af8ad67da108e4a0d477ff7, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 6316289638477159272}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: eff298bd2af8ad67da108e4a0d477ff7, type: 3}
       insertIndex: -1
@@ -487,7 +490,63 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   turnSpeed: 90
   localAnimator: {fileID: 4666994284858265928}
+  nickname:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0016: 0
+        byte0017: 0
+        byte0018: 0
+        byte0019: 0
+        byte0020: 0
+        byte0021: 0
+        byte0022: 0
+        byte0023: 0
+        byte0024: 0
+        byte0025: 0
+        byte0026: 0
+        byte0027: 0
+        byte0028: 0
+        byte0029: 0
   networkAnimator: {fileID: 7233489695671994211}
+--- !u!114 &1744793409788919269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2121057896854507912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7a03168a2032bd458e746f4a1922b0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLobbyState
+  ShowTopMostFoldoutHeaderGroup: 1
+  IsReady:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
 --- !u!136 &6316289638477159272
 CapsuleCollider:
   m_ObjectHideFlags: 0

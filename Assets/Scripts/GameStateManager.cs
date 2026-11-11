@@ -2,10 +2,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
-using Unity.Profiling;
-using Unity.VisualScripting;
-using NUnit.Framework;
-using UnityEngine.AI;   // temporary: the test key in Step Eight
 
 public enum GameState : byte { Lobby, Countdown, Playing, Ended }
 
@@ -15,6 +11,9 @@ public class GameStateManager : NetworkBehaviour
 
     [SerializeField] private float countdownSeconds = 3f;
     [SerializeField] private float roundSeconds = 90f;
+    [SerializeField] private int minimumPlayers = 2;
+
+    public int MinimumPlayers => minimumPlayers;
 
     public NetworkVariable<GameState> State = new(GameState.Lobby);
     public NetworkVariable<double> PhaseEndTime = new(0);
@@ -57,7 +56,15 @@ public class GameStateManager : NetworkBehaviour
     {
         BeginPhase(GameState.Playing, roundSeconds);
     }
+    private bool EveryoneReady()
+    {
+        if (PlayerLobbyState.All.Count < minimumPlayers) return false;
 
+        foreach(PlayerLobbyState player in PlayerLobbyState.All)
+            if (!player.IsReady.Value) return false;
+
+        return true;
+    }
     private void EndRound()
     {
         if (State.Value == GameState.Ended) return; //ends once only
@@ -72,14 +79,14 @@ public class GameStateManager : NetworkBehaviour
         switch (State.Value)
         {
             case GameState.Lobby:
-            //Tempoary for testing purposes
-                if (Keyboard.current.enterKey.wasPressedThisFrame)
-                    BeginPhase(GameState.Countdown, countdownSeconds);
-                break;
+                if (EveryoneReady())                                    
+                    BeginPhase(GameState.Countdown, countdownSeconds);  
+                break;                                                  
+
             case GameState.Countdown:
-                if (SecondsRemaining <= 0f) 
-                    StartRound();
-            break;    
+                if (!EveryoneReady()) State.Value = GameState.Lobby;    
+                else if (SecondsRemaining <= 0f) StartRound();          
+                break;                                                      
             
             case GameState.Playing:
                 if(SecondsRemaining <= 0f) EndRound();
