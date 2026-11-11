@@ -26,6 +26,10 @@ public class ConnectionManagerUI : MonoBehaviour
 
     void Start()
     {
+        // Must be set before any button starts the network, because the host's own
+        // player goes through approval too. NGO allows only one callback, hence = not +=.
+        NetworkManager.Singleton.ConnectionApprovalCallback = ApproveConnection;
+
         serverButton.onClick.AddListener( () => { 
             ConfigureAsHost();
             NetworkManager.Singleton.StartServer(); 
@@ -98,6 +102,23 @@ public class ConnectionManagerUI : MonoBehaviour
 
         string reason = NetworkManager.Singleton.DisconnectReason;
         ShowMenu(string.IsNullOrEmpty(reason) ? "Lost connection to the host." : reason);
+    }
+
+    // The Server runs this for every connection request and answers yes or no.
+    // Joining during Countdown is allowed: the new player is not ready, so the
+    // countdown drops back to Lobby.
+    private void ApproveConnection(NetworkManager.ConnectionApprovalRequest request,
+                                   NetworkManager.ConnectionApprovalResponse response)
+    {
+        GameStateManager game = GameStateManager.Singleton;
+        bool matchRunning = game != null && game.IsSpawned &&
+            (game.State.Value == GameState.Playing || game.State.Value == GameState.Ended);
+
+        response.Approved = !matchRunning;
+        response.CreatePlayerObject = true;
+        response.Reason = matchRunning
+            ? "A match is already in progress. Try again when it ends."
+            : string.Empty;
     }
     
     public static string GetLocalIPv4()

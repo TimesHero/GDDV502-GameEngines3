@@ -14,7 +14,8 @@ public class PlayerNetworkController : NetworkBehaviour
     [SerializeField] private Animator localAnimator;
 
     public NetworkVariable<FixedString32Bytes> nickname = new();
-    public int Score {get; set; } = 0;
+    // Everyone can read Score, but only the Server can change it.
+    public NetworkVariable<int> Score = new(0);
     [SerializeField] private NetworkAnimator networkAnimator;
 
     private readonly int isMovingParam = Animator.StringToHash("IsMoving");
@@ -60,6 +61,32 @@ public class PlayerNetworkController : NetworkBehaviour
     private Vector3 GetRandomPosition()
     {
         return new Vector3(Random.Range(-4f, 4f), 0f, Random.Range(-4f, 4f));
+    }
+
+    // NetworkTransform uses Server authority, so only the Server may move a player.
+    public void ServerRespawn()
+    {
+        if (IsServer) transform.position = GetRandomPosition();
+    }
+
+    // The one place a score changes. A negative amount takes points away,
+    // and Mathf.Max stops the score from going below zero.
+    public void ServerAddScore(int amount)
+    {
+        if (!IsServer) return;
+
+        Score.Value = Mathf.Max(0, Score.Value + amount);
+        ScorePanelManager.Singleton.UpdateScoreEntryRpc(OwnerClientId, Score.Value);
+        GameStateManager.Singleton.ReportScore(Score.Value);
+    }
+
+    // Used between rounds. It skips ReportScore(), because a reset is not a score.
+    public void ServerResetScore()
+    {
+        if (!IsServer) return;
+
+        Score.Value = 0;
+        ScorePanelManager.Singleton.UpdateScoreEntryRpc(OwnerClientId, 0);
     }
 
     void Update()

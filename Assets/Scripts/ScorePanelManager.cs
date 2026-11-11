@@ -13,7 +13,6 @@ public class ScorePanelManager : NetworkBehaviour
 
     [SerializeField] private GameObject scoreEntryPrefab;
     [SerializeField] private Transform scorePanel;
-    [SerializeField] private uint winningScore = 1;
 
     private readonly Dictionary<ulong, GameObject> scoreEntries = new();
 
@@ -90,7 +89,7 @@ public class ScorePanelManager : NetworkBehaviour
 
             clientIds[i] = client.Key;              // Get existing clients' ids.
             clientNames[i] = player.nickname.Value; // Get existing clients' nicknames.
-            clientScores[i] = player.Score;         // Get existing clients' scores.
+            clientScores[i] = player.Score.Value;         // Get existing clients' scores.
             i++;
         }
 
@@ -181,9 +180,6 @@ public class ScorePanelManager : NetworkBehaviour
         {
             ScoreEntryController sec = entry.GetComponent<ScoreEntryController>();
             sec.UpdateScore(newScore);
-
-            if (newScore == winningScore)
-                NetworkManager.Singleton.SceneManager.LoadScene("EndScene", LoadSceneMode.Single);
         }
     }
     #endregion
