@@ -30,7 +30,7 @@ public class VictoryPanelManager : NetworkBehaviour
             PlayerNetworkController[] players =
                 clients.Select(entry => entry.Value.PlayerObject.GetComponent<PlayerNetworkController>()).ToArray();
 
-            players = players.OrderByDescending(player => player.Score).ToArray();
+            players = players.OrderByDescending(player => player.Score.Value).ToArray();
             SendVictorNicknameRpc(players[0].nickname.Value);
         }
 

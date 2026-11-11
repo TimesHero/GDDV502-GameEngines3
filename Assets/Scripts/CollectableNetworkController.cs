@@ -7,22 +7,21 @@ public class CollectableNetworkController : NetworkBehaviour
     public int pointValue = 1;
     private void OnTriggerEnter(Collider other)
     {
-        if(IsServer)
-        {
-            NetworkObject playerObject = other.GetComponent<NetworkObject>();
-            AwardPointsToPlayer(playerObject.OwnerClientId);
+        if (!IsServer || !IsSpawned) return;
+        if (GameStateManager.Singleton.State.Value != GameState.Playing) return;
 
-            NetworkObject obj = GetComponent<NetworkObject>();
-            obj.Despawn();
-        }
+        if (!other.TryGetComponent(out NetworkObject playerObject)
+            || !playerObject.IsPlayerObject) return;
+
+        AwardPointsToPlayer(playerObject.OwnerClientId);
+        NetworkObject.Despawn();
     }
-    
+
     private void AwardPointsToPlayer(ulong clientId)
     {
         NetworkObject player = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
         PlayerNetworkController playerController = player.GetComponent<PlayerNetworkController>();
 
-        playerController.Score += 1;
-        ScorePanelManager.Singleton.UpdateScoreEntryRpc(clientId, playerController.Score);
+        playerController.ServerAddScore(pointValue);
     }
 }

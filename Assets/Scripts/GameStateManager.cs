@@ -1,7 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 
 public enum GameState : byte { Lobby, Countdown, Playing, Ended }
 
@@ -12,6 +11,7 @@ public class GameStateManager : NetworkBehaviour
     [SerializeField] private float countdownSeconds = 3f;
     [SerializeField] private float roundSeconds = 90f;
     [SerializeField] private int minimumPlayers = 2;
+    [SerializeField] private int winningScore = 10;
 
     public int MinimumPlayers => minimumPlayers;
 
@@ -54,6 +54,10 @@ public class GameStateManager : NetworkBehaviour
 
     private void StartRound()
     {
+        // Put every player on a new random spot so nobody gets a head start.
+        foreach (PlayerLobbyState player in PlayerLobbyState.All)
+            player.Controller.ServerRespawn();
+
         BeginPhase(GameState.Playing, roundSeconds);
     }
     private bool EveryoneReady()
@@ -65,11 +69,39 @@ public class GameStateManager : NetworkBehaviour
 
         return true;
     }
+
+    // Called by the Server each time a player's score changes.
+    // >= instead of == so a 2-point patty that jumps from 9 to 11 still wins.
+    public void ReportScore(int score)
+    {
+        if (IsServer && score >= winningScore) EndRound();
+    }
+
+    // Called by the host's Play Again button. Resets the match and returns everyone to the lobby.
+    public void PlayAgain()
+    {
+        if (!IsServer || State.Value != GameState.Ended) return;
+
+        // Clear the leftover patties. Despawn() on the Server removes them on every machine.
+        // This happens here instead of in EndRound(), because the winning patty despawns
+        // itself right after it ends the round, and despawning it twice is an error.
+        foreach (CollectableNetworkController patty in
+                 FindObjectsByType<CollectableNetworkController>(FindObjectsSortMode.None))
+            if (patty.IsSpawned) patty.NetworkObject.Despawn();
+
+        foreach (PlayerLobbyState player in PlayerLobbyState.All)
+        {
+            player.IsReady.Value = false;
+            player.Controller.ServerResetScore();
+        }
+
+        State.Value = GameState.Lobby;
+    }
+
     private void EndRound()
     {
         if (State.Value == GameState.Ended) return; //ends once only
         State.Value = GameState.Ended;
-        NetworkManager.SceneManager.LoadScene("EndScene", LoadSceneMode.Single);
     }
 
     private void Update()
