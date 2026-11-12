@@ -51,7 +51,9 @@ public class LobbyPanelManager : MonoBehaviour
     private void Update()
     {
         GameStateManager game = GameStateManager.Singleton;
-        bool connected = NetworkManager.Singleton.IsListening
+        // NetworkManager.Singleton is null for a moment when Play mode stops.
+        bool connected = NetworkManager.Singleton != null
+                     && NetworkManager.Singleton.IsListening
                      && game != null && game.IsSpawned;
         GameState state = connected ? game.State.Value : GameState.Lobby;
 
